@@ -4,7 +4,7 @@ import { createMatcher, getFullFaceDescriptions } from '../../services/faceapi';
 import axios from 'axios';
 import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
-const VideoInput = ({onRecognize}) => {
+const VideoInput = ({ onRecognize }) => {
     // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
@@ -93,7 +93,7 @@ const VideoInput = ({onRecognize}) => {
                         console.error(e)
                     })
                 };
-        
+
             }
             capture();
         }, 1500);
@@ -108,7 +108,7 @@ const VideoInput = ({onRecognize}) => {
                 let temp = descriptions.map(desc => faceMatcher.findBestMatch(desc))
                 // console.log('detections',detections);
                 // console.log('match',temp)
-                if(!!temp[0] && temp[0]._label==='unknown'){
+                if (!!temp[0] && temp[0]._label === 'unknown') {
                     //console.log(temp)
                     onRecognize(true)
                 }
@@ -167,7 +167,7 @@ const VideoInput = ({onRecognize}) => {
         }
         drawDetection();
     }, [detections, match])
-  
+
 
     const setInputDevice = () => {
         navigator.mediaDevices.enumerateDevices().then(async devices => {

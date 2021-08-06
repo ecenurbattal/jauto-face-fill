@@ -2,7 +2,8 @@ import './App.css';
 import { useEffect, useState } from 'react';
 import { getFormQuestions, getForms } from './services/jotform';
 import VideoInput from '../src/components/VideoInput/VideoInput';
-import {loadModels} from '../src/services/faceapi';
+import { loadModels } from '../src/services/faceapi';
+import NonrecognizeAlert from './components/NonrecognizeAlert/NonrecognizeAlert';
 
 function App() {
 
@@ -10,7 +11,7 @@ function App() {
   const [fields,setFields] = useState();
   // const subLabels = [{
   //   name:['first,last'],
-    
+
   // }]
 
   // const submissionLabels = {
@@ -31,9 +32,9 @@ function App() {
   }, [])
 
   // useEffect(() => {
-    
+
   //     console.log('query',queryString)
-    
+
   // },[queryString])
 
 
@@ -76,7 +77,7 @@ function App() {
     console.log(fields)
   },[fields])
 
-  const [isRecognize,setIsRecognize] = useState(false);
+  const [isRecognize, setIsRecognize] = useState(false);
 
   const handleRecognize = (isRecognize) => {
     setIsRecognize(isRecognize)
@@ -89,27 +90,27 @@ function App() {
       console.log(form)
       jotform.setFieldsValueById([
         {
-          id:'5',
-          value:'ecenurbattal@gmail.com'
+          id: '5',
+          value: 'ecenurbattal@gmail.com'
         },
         {
-          id:'4',
-          value:''
+          id: '4',
+          value: ''
         },
         {
-          id:'6',
-          value:'5343107823'
+          id: '6',
+          value: '5343107823'
         },
         {
-          id:'7',
-          items:[{key:'city',value:'sdfkdsşlgds'},{key:'state',value:'dsşlgjkdsl'}]
+          id: '7',
+          items: [{ key: 'city', value: 'sdfkdsşlgds' }, { key: 'state', value: 'dsşlgjkdsl' }]
         }
       ])
     })
 
     //subscribe to submit evetn
-    jotform.subscribe("submit", function(data){
-      console.log('submit edildi',data)
+    jotform.subscribe("submit", function (data) {
+      console.log('submit edildi', data)
       //prepare your data
       // var data = {}
       // //check validity
@@ -121,8 +122,8 @@ function App() {
       // }
 
       // jotform.sendSubmit(data);
-  });
-  },[jotform])
+    });
+  }, [jotform])
 
 
   // useEffect(() => {
@@ -143,7 +144,7 @@ function App() {
 
   return (
     <div className="App">
-     {!isRecognize ?  <VideoInput onRecognize={handleRecognize}/> : <p>Merhaba</p>}
+      {!isRecognize ? <VideoInput onRecognize={handleRecognize} /> : <NonrecognizeAlert />}
     </div>
   );
 }
