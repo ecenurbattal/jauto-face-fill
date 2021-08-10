@@ -136,8 +136,8 @@ function App() {
       console.log('submit edildi')
         jotform.getFieldsValueById(getIds(widgetFormFields),(content) => {
           console.log('get',content)
-          if(isRecognize) setNewUserInfo(setUserInfo(content.data,description))
-          //jotform.sendSubmit(content);
+          if(!isRecognize) setNewUserInfo(setUserInfo(content.data,description))
+          jotform.sendSubmit(content);
         })
     });
   }, [description, isRecognize, jotform, submissionLabels, widgetFormFields])
