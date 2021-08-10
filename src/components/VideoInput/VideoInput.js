@@ -5,7 +5,11 @@ import axios from 'axios';
 import { getSubmissions } from '../../services/jotform';
 //import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
+<<<<<<< HEAD
 const VideoInput = ({ onRecognize, setDescription }) => {
+=======
+const VideoInput = ({ onRecognized }) => {
+>>>>>>> 3426b6601c939f83c9bae5326d7f1d106633d352
     // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
@@ -109,7 +113,7 @@ const VideoInput = ({ onRecognize, setDescription }) => {
         return () => clearInterval(interval);
     }, [setDescription, webcamRef])
 
-
+    let initialRender = true;
     useEffect(() => {
         const init = () => {
             if (!!descriptions && !!faceMatcher) {
@@ -119,14 +123,17 @@ const VideoInput = ({ onRecognize, setDescription }) => {
                 // console.log('match',temp)
                 if (!!temp[0] && temp[0]._label === 'unknown') {
                     //console.log(temp)
-                    onRecognize(true)
+
+                    onRecognized(false)
+                } else if (!!temp[0] && temp[0]._label !== 'unknown') {
+                    onRecognized(true)
                 }
                 //console.log(temp)
                 setMatch(temp)
             }
         }
         init();
-    }, [descriptions, faceMatcher, onRecognize])
+    }, [descriptions, faceMatcher, onRecognized])
 
 
     useEffect(() => {

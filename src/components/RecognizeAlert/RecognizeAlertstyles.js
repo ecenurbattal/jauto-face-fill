@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 
-export const OuterNonrecognized = styled.div`
+export const OuterRecognized = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
