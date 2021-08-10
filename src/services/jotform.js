@@ -8,10 +8,14 @@ const instance = axios.create({
     }
 })
 
-export const getForms = () => {
-   return instance.get('/user/forms');
-}
-
 export const getFormQuestions = (formId) => {
     return instance.get(`/form/${formId}/questions`);
+}
+
+export const createSubmission = (formId,submission) => {
+    return instance.post(`/form/${formId}/submissions`,submission)
+}
+
+export const getSubmissions = (formId) => {
+    return instance.get(`/form/${formId}/submissions`);
 }

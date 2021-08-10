@@ -1,28 +1,35 @@
 import './App.css';
-import { useEffect, useState } from 'react';
-import { getFormQuestions, getForms } from './services/jotform';
+import { useEffect, useMemo, useState } from 'react';
+import { createSubmission, getFormQuestions } from './services/jotform';
 import VideoInput from '../src/components/VideoInput/VideoInput';
 import { loadModels } from '../src/services/faceapi';
 import NonrecognizeAlert from './components/NonrecognizeAlert/NonrecognizeAlert';
+import { getIds, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
 
 function App() {
 
-  
+  const jotform = window.JFCustomWidget;
   const [fields,setFields] = useState();
-  // const subLabels = [{
-  //   name:['first,last'],
+  const [widgetFormFields,setWidgetFormFields] = useState();
+  const [submission,setSubmission] = useState();
+  const [isRecognize, setIsRecognize] = useState(false);
+  const [description,setDescription] = useState();
+  const [newUserInfo,setNewUserInfo] = useState(
+    // [{name:'first',value:'Ece Nur'},
+    // {name:'last',value:'Battal'},
+    // {name:'email',value:'ecenurbattal@gmail.com'},
+    // {name:'full',value:'5343107823'}]
+  );
 
-  // }]
+  const submissionLabels = useMemo(() => {
+    return [
+      {name:'name',labels:['first','last']},
+      {name:'email',labels:['email']},
+      {name:'phoneNumber',labels:['full']},
+      {name:'descriptionArray',labels:['descriptionArray']}
+    ]
+  }, [])
 
-  // const submissionLabels = {
-  //   name:['first,last'],
-  //   email:[''],
-  //   phoneNumber:['full'],
-  //   address:['addr_line1','addr_line2','city','country','postal','state'],
-  //   descriptionArray:['']
-  // }
-
-  // const [queryString,setQueryString] = useState('?');
 
   useEffect(() => {
     const init = async () => {
@@ -31,120 +38,98 @@ function App() {
     init();
   }, [])
 
-  // useEffect(() => {
 
-  //     console.log('query',queryString)
-
-  // },[queryString])
-
-
-  // useEffect(() => {
-  //   const init = async () => {
-  //     try {
-  //       const {data} = await getForms();
-  //       console.log("Forms",data)
-  //       let temp = `${queryString}&${submissionLabels.keys[0]}[first]`
-  //       console.log(temp)
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-  //   }
-  //   init();
-  // },[submissionLabels])
 
   useEffect(() => {
     const init = async () => {
       try {
         const {data} = await getFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-        console.log("Questions",Object.values(data.content))
-        //let array = [];
-        const submissionLabels = ['name','email','phoneNumber'];
-        setFields(Object.values(data.content).forEach((item) => {
-          if(submissionLabels.some((label) => (
-            label === item.name
-          ))){
-            return item
-          }
-        }))
+        console.log(data)
+        setFields(setQuestionsArray(data.content,submissionLabels))
       } catch (error) {
         console.log(error)
       }
     }
     init();
-  },[])
+  },[submissionLabels])
+
 
   useEffect(() => {
-    console.log(fields)
-  },[fields])
+    //console.log('fields',fields)
+    if(!!fields && !!newUserInfo){
+      
+      //console.log('user info',newUserInfo)
+      setSubmission(setSubmissionArray(fields,newUserInfo))
+    }
+  },[fields,newUserInfo])
 
-  const [isRecognize, setIsRecognize] = useState(false);
+
+
+  useEffect(() => {
+    if(!!submission){
+      const init = async () => {
+        try {
+          const {data} = await createSubmission(process.env.REACT_APP_JOTFORM_DBFORM_ID,submission)
+          console.log(data)
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      init();
+    }
+  },[submission])
+
+
+
+  useEffect(() => {
+    jotform.subscribe("ready", async (form) => {
+      //console.log(form)
+      try {
+        const {data} = await getFormQuestions(form.formID)
+        setWidgetFormFields(setQuestionsArray(data.content,submissionLabels))
+      } catch (error) {
+        console.log(error)
+      }
+      // jotform.setFieldsValueById([
+      //   {
+      //     id: '5',
+      //     value: 'ecenurbattal@gmail.com'
+      //   },
+      //   {
+      //     id: '4',
+      //     value: 'Ece Nur Battal'
+      //   },
+      //   {
+      //     id: '6',
+      //     value: '5343107823'
+      //   },
+      //   {
+      //     id: '7',
+      //     items: [{ key: 'city', value: 'sdfkdsşlgds' }, { key: 'state', value: 'dsşlgjkdsl' }]
+      //   }
+      // ])
+    })
+
+    //subscribe to submit event
+    jotform.subscribe("submit", function () {
+      console.log('submit edildi')
+        jotform.getFieldsValueById(getIds(widgetFormFields),(content) => {
+          console.log('get',content)
+          if(isRecognize) setNewUserInfo(setUserInfo(content.data,description))
+          //jotform.sendSubmit(content);
+        })
+    });
+  }, [description, isRecognize, jotform, submissionLabels, widgetFormFields])
+
 
   const handleRecognize = (isRecognize) => {
     setIsRecognize(isRecognize)
   }
 
-  const jotform = window.JFCustomWidget;
-
-  useEffect(() => {
-    jotform.subscribe("ready", (form) => {
-      console.log(form)
-      jotform.setFieldsValueById([
-        {
-          id: '5',
-          value: 'ecenurbattal@gmail.com'
-        },
-        {
-          id: '4',
-          value: ''
-        },
-        {
-          id: '6',
-          value: '5343107823'
-        },
-        {
-          id: '7',
-          items: [{ key: 'city', value: 'sdfkdsşlgds' }, { key: 'state', value: 'dsşlgjkdsl' }]
-        }
-      ])
-    })
-
-    //subscribe to submit evetn
-    jotform.subscribe("submit", function (data) {
-      console.log('submit edildi', data)
-      //prepare your data
-      // var data = {}
-      // //check validity
-      // if(photo.src.length === 0 || photo.src.match('placekitten')!==null) {
-      //   data.valid = false
-      // } else {
-      //   data.valid = true,
-      //   data.value = photo.src
-      // }
-
-      // jotform.sendSubmit(data);
-    });
-  }, [jotform])
-
-
-  // useEffect(() => {
-  //   function isItemInArray(array, item) {
-  //     for (var i = 0; i < array.length; i++) {
-  //         // This if statement depends on the format of your array
-  //         if (array[i][0] === item[0] && array[i][1] === item[1]) {
-  //             array.splice(i,1);   // Found it
-  //             return array;
-  //         }
-  //     }
-  //     return;   // Not found
-  //   }
-  //   const arr = [1,2,3,[4,5],6,7,[8,9,10]];
-  //   console.log(isItemInArray(arr,[4,5]))
-  // },[])
-
 
   return (
     <div className="App">
-      {!isRecognize ? <VideoInput onRecognize={handleRecognize} /> : <NonrecognizeAlert />}
+      {!isRecognize ? <VideoInput setDescription={setDescription} onRecognize={handleRecognize} /> : <NonrecognizeAlert />}
     </div>
   );
 }

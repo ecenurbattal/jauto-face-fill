@@ -2,9 +2,10 @@ import Webcam from 'react-webcam';
 import React, { useEffect, useState } from 'react'
 import { createMatcher, getFullFaceDescriptions } from '../../services/faceapi';
 import axios from 'axios';
-import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
+import { getSubmissions } from '../../services/jotform';
+//import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
-const VideoInput = ({ onRecognize }) => {
+const VideoInput = ({ onRecognize, setDescription }) => {
     // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
@@ -24,12 +25,9 @@ const VideoInput = ({ onRecognize }) => {
 
     useEffect(() => {
         const init = async () => {
-            //await loadModels();
             setWebcamRef(React.createRef());
             try {
                 const { data } = await axios.get('./db.json')
-                //console.log('dbFaces', data.users)
-                //setFaceMatcher(createMatcher(data))
                 setDbFaces(data.users)
 
             } catch (error) {
@@ -39,6 +37,18 @@ const VideoInput = ({ onRecognize }) => {
         init();
 
     }, [])
+
+    useEffect(() => {
+        const init = async () => {
+          try {
+            const {data} = await getSubmissions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
+            //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))
+          } catch (error) {
+            console.log(error)
+          }
+        }
+        init();
+      },[])
 
 
     useEffect(() => {
@@ -62,10 +72,8 @@ const VideoInput = ({ onRecognize }) => {
 
             if (facingMode === 'user') {
                 setCamera('Front')
-                // camera = 'Front';
             } else {
                 setCamera('Back')
-                // camera = 'Back';
             }
         }
     }
@@ -86,8 +94,9 @@ const VideoInput = ({ onRecognize }) => {
                     ).then(fullDesc => {
                         if (!!fullDesc) {
                             setDetections(fullDesc.map(fd => fd.detection))
-                            //console.log(fullDesc.map(fd => fd.descriptor))
                             setDescriptions(fullDesc.map(fd => fd.descriptor))
+                            setDescription(fullDesc.map(fd => Object.values(fd.descriptor)))
+                            //console.log(fullDesc.map(fd => Object.values(fd.descriptor)))
                         }
                     }).catch((e) => {
                         console.error(e)
@@ -98,7 +107,7 @@ const VideoInput = ({ onRecognize }) => {
             capture();
         }, 1500);
         return () => clearInterval(interval);
-    }, [webcamRef])
+    }, [setDescription, webcamRef])
 
 
     useEffect(() => {
