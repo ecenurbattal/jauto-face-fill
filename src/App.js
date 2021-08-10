@@ -4,11 +4,12 @@ import { getFormQuestions, getForms } from './services/jotform';
 import VideoInput from '../src/components/VideoInput/VideoInput';
 import { loadModels } from '../src/services/faceapi';
 import NonrecognizeAlert from './components/NonrecognizeAlert/NonrecognizeAlert';
+import RecognizeAlert from './components/RecognizeAlert/RecognizeAlert';
 
 function App() {
 
-  
-  const [fields,setFields] = useState();
+
+  const [fields, setFields] = useState();
   // const subLabels = [{
   //   name:['first,last'],
 
@@ -52,17 +53,17 @@ function App() {
   //   init();
   // },[submissionLabels])
 
-  useEffect(() => {
+  /* useEffect(() => {
     const init = async () => {
       try {
-        const {data} = await getFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-        console.log("Questions",Object.values(data.content))
+        const { data } = await getFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
+        console.log("Questions", Object.values(data.content))
         //let array = [];
-        const submissionLabels = ['name','email','phoneNumber'];
+        const submissionLabels = ['name', 'email', 'phoneNumber'];
         setFields(Object.values(data.content).forEach((item) => {
-          if(submissionLabels.some((label) => (
+          if (submissionLabels.some((label) => (
             label === item.name
-          ))){
+          ))) {
             return item
           }
         }))
@@ -71,16 +72,36 @@ function App() {
       }
     }
     init();
-  },[])
+  }, [])
 
   useEffect(() => {
     console.log(fields)
-  },[fields])
-
+  }, [fields]) */
+  const [initialRender, setInıtialRender] = useState(true);
+  const [pressed, setPressed] = useState(false);
   const [isRecognize, setIsRecognize] = useState(false);
 
+  let onRecognize;
+
+  useEffect(() => {
+    if (initialRender) {
+      setInıtialRender(false)
+    } else {
+      setIsRecognize(onRecognize);
+    }
+  }, [pressed]);
+
+
   const handleRecognize = (isRecognize) => {
-    setIsRecognize(isRecognize)
+
+    // setIsRecognize(isRecognize);
+
+    onRecognize = isRecognize;
+    // setPressed(true);
+    setPressed(true)
+
+
+
   }
 
   const jotform = window.JFCustomWidget;
@@ -91,7 +112,7 @@ function App() {
       jotform.setFieldsValueById([
         {
           id: '5',
-          value: 'ecenurbattal@gmail.com'
+          value: 'doki9706@gmail.com'
         },
         {
           id: '4',
@@ -143,9 +164,13 @@ function App() {
 
 
   return (
+
     <div className="App">
-      {!isRecognize ? <VideoInput onRecognize={handleRecognize} /> : <NonrecognizeAlert />}
-    </div>
+      {pressed ? (isRecognize ? <>< RecognizeAlert /></> : <><NonrecognizeAlert /></>
+      ) : console.log("initial render=true")}
+
+      <VideoInput onRecognized={handleRecognize} />
+    </div >
   );
 }
 

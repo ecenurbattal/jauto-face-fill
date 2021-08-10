@@ -4,7 +4,7 @@ import { createMatcher, getFullFaceDescriptions } from '../../services/faceapi';
 import axios from 'axios';
 import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
-const VideoInput = ({ onRecognize }) => {
+const VideoInput = ({ onRecognized }) => {
     // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
@@ -100,7 +100,7 @@ const VideoInput = ({ onRecognize }) => {
         return () => clearInterval(interval);
     }, [webcamRef])
 
-
+    let initialRender = true;
     useEffect(() => {
         const init = () => {
             if (!!descriptions && !!faceMatcher) {
@@ -110,14 +110,17 @@ const VideoInput = ({ onRecognize }) => {
                 // console.log('match',temp)
                 if (!!temp[0] && temp[0]._label === 'unknown') {
                     //console.log(temp)
-                    onRecognize(true)
+
+                    onRecognized(false)
+                } else if (!!temp[0] && temp[0]._label !== 'unknown') {
+                    onRecognized(true)
                 }
                 //console.log(temp)
                 setMatch(temp)
             }
         }
         init();
-    }, [descriptions, faceMatcher, onRecognize])
+    }, [descriptions, faceMatcher, onRecognized])
 
 
     useEffect(() => {

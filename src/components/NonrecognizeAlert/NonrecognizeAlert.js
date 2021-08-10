@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { Box } from '@material-ui/core'
 import { OuterNonrecognized } from './NonrecognizeAlertstyles';
+// import SentimentVeryDissatisfiedIcon from '@material-ui/icons/SentimentVeryDissatisfied';
+import emoji from 'react-easy-emoji'
 
 const useStyles = makeStyles(theme => ({
     alignItemsAndJustifyContent: {
@@ -25,6 +27,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
+emoji('Emojis make me 😟')
+
 const NonrecognizeAlert = () => {
 
     const classes = useStyles();
@@ -43,15 +47,14 @@ const NonrecognizeAlert = () => {
                 <div>
 
                     <Alert severity="error" >
-                        <AlertTitle alignItems="center" justifyContent="center">Yüzünüzü Tanıyamadık :(</AlertTitle>
-                        <strong>Lütfen kişisel bilgiler formunu doldurunuz.</strong>
+                        <AlertTitle alignItems="center" justifyContent="center">We couldn't recognize your face {emoji('😟')} </AlertTitle>
+                        <strong>Please fill in the personal info form.</strong>
                     </Alert>
 
                 </div >
             </OuterNonrecognized>
 
         </React.Fragment>
-
 
 
 
