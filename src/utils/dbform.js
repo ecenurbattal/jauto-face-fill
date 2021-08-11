@@ -15,6 +15,25 @@ export const setQuestionsArray = (dbContent,submissionLabels) => {
     return array;
 }
 
+
+export const parseSubmissions = (submissions,submissionLabels) => {
+    let submissionsArray = [];
+    let submissionObject = {};
+    submissions.forEach((submission) => {
+        Object.values(submission.answers).forEach((answer) => {
+            if(submissionLabels.some((label) => (
+                label.name === answer.name
+            ))){
+                submissionObject[`${answer.name}`] = answer.name === 'descriptionArray' ? Object.values(answer.answer).toString() : Object.values(answer.answer).toString().replace(',',' ')
+                //console.log(answer.prettyFormat.length ? answer.prettyFormat : Object.values(answer.answer).toString())
+            }
+        })
+        !!(submissionObject) && submissionsArray.push({...submissionObject,id:submission.id})
+        submissionObject = {};
+    })
+    return submissionsArray;
+}
+
 export const getIds = (fieldsArray) => {
     return fieldsArray.map((field) => (
         String(field.qid)

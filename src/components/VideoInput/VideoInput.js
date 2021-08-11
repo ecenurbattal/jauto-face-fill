@@ -1,11 +1,13 @@
 import Webcam from 'react-webcam';
 import React, { useEffect, useState } from 'react'
 import { createMatcher, getFullFaceDescriptions } from '../../services/faceapi';
-import axios from 'axios';
+//import axios from 'axios';
 import { getSubmissions } from '../../services/jotform';
+import { parseSubmissions } from '../../utils/dbform';
+import { submissionLabels } from '../../constants/submissionLabels';
 //import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
-const VideoInput = ({ onRecognized, setDescription }) => {
+const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
     // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
@@ -23,26 +25,30 @@ const VideoInput = ({ onRecognized, setDescription }) => {
     const HEIGHT = 420;
     const inputSize = 160;
 
+    // useEffect(() => {
+    //     const init = async () => {
+    //         setWebcamRef(React.createRef());
+    //         try {
+    //             const { data } = await axios.get('./db.json')
+    //             setDbFaces(data.users)
+
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+    //     }
+    //     init();
+
+    // }, [])
+
     useEffect(() => {
         const init = async () => {
-            setWebcamRef(React.createRef());
-            try {
-                const { data } = await axios.get('./db.json')
-                setDbFaces(data.users)
-
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        init();
-
-    }, [])
-
-    useEffect(() => {
-        const init = async () => {
+        setWebcamRef(React.createRef());
           try {
             const {data} = await getSubmissions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-            //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))
+            // console.log('submissions',data.content)
+            // console.log(parseSubmissions(data.content,submissionLabels))
+            setDbFaces(parseSubmissions(data.content,submissionLabels))
+             //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))
           } catch (error) {
             console.log(error)
           }
@@ -54,6 +60,7 @@ const VideoInput = ({ onRecognized, setDescription }) => {
     useEffect(() => {
         const init = async () => {
             if (!!dbFaces) {
+                //console.log('dbFaces',dbFaces)
                 setFaceMatcher(createMatcher(dbFaces))
                 setInputDevice();
             }
@@ -95,8 +102,8 @@ const VideoInput = ({ onRecognized, setDescription }) => {
                         if (!!fullDesc) {
                             setDetections(fullDesc.map(fd => fd.detection))
                             setDescriptions(fullDesc.map(fd => fd.descriptor))
-                            setDescription(fullDesc.map(fd => Object.values(fd.descriptor)))
-                            //console.log(fullDesc.map(fd => Object.values(fd.descriptor)))
+                            if(!!(fullDesc.length)) setDescription(fullDesc.map(fd => Object.values(fd.descriptor)))
+                            //console.log('fullDesc',fullDesc.map(fd => Object.values(fd.descriptor)))
                         }
                     }).catch((e) => {
                         console.error(e)
@@ -109,9 +116,6 @@ const VideoInput = ({ onRecognized, setDescription }) => {
         return () => clearInterval(interval);
     }, [setDescription, webcamRef])
 
-
-    let initialRender = true;
-
     useEffect(() => {
         const init = () => {
             if (!!descriptions && !!faceMatcher) {
@@ -123,14 +127,16 @@ const VideoInput = ({ onRecognized, setDescription }) => {
                     //console.log(temp)
                     onRecognized(false)
                 } else if (!!temp[0] && temp[0]._label !== 'unknown') {
-                    onRecognized(true)
+                    onRecognized(true);
+                    setRecognizedUser(Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))
+                    //console.log('recognizedUser',Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))
                 }
                 //console.log(temp)
                 setMatch(temp)
             }
         }
         init();
-    }, [descriptions, faceMatcher, onRecognized])
+    }, [dbFaces, descriptions, faceMatcher, onRecognized, setRecognizedUser])
 
 
     useEffect(() => {

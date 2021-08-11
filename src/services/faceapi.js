@@ -30,9 +30,10 @@ export const getFullFaceDescriptions = async (blob, inputSize = 512) => {
 export const createMatcher = (data) => {
 
     let labeledDescriptors = data.map((member) => (
+        //console.log(JSON.parse(member.descriptionArray.replace(' ',',')))
         new faceapi.LabeledFaceDescriptors(
-            member.name,
-            member.descriptors.map((descriptor) => (
+            member.id,
+            JSON.parse(member.descriptionArray).map((descriptor) => (
                 new Float32Array(descriptor)
             ))
         )

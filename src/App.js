@@ -1,11 +1,12 @@
 import './App.css';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createSubmission, getFormQuestions } from './services/jotform';
 import VideoInput from '../src/components/VideoInput/VideoInput';
 import { loadModels } from '../src/services/faceapi';
 import NonrecognizeAlert from './components/NonrecognizeAlert/NonrecognizeAlert';
 import { getIds, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
 import RecognizeAlert from './components/RecognizeAlert/RecognizeAlert';
+import { submissionLabels } from './constants/submissionLabels';
 
 function App() {
 
@@ -16,7 +17,8 @@ function App() {
   const [isRecognize, setIsRecognize] = useState(false);
   const [description,setDescription] = useState();
   const [initialRender, setInıtialRender] = useState(true);
-  const [pressed, setPressed] = useState(false);
+  const [isDetect, setIsDetect] = useState(false);
+  const [recognizedUser,setRecognizedUser] = useState();
   const [newUserInfo,setNewUserInfo] = useState(
     // [{name:'first',value:'Ece Nur'},
     // {name:'last',value:'Battal'},
@@ -24,14 +26,14 @@ function App() {
     // {name:'full',value:'5343107823'}]
   );
 
-  const submissionLabels = useMemo(() => {
-    return [
-      {name:'name',labels:['first','last']},
-      {name:'email',labels:['email']},
-      {name:'phoneNumber',labels:['full']},
-      {name:'descriptionArray',labels:['descriptionArray']}
-    ]
-  }, [])
+  // const submissionLabels = useMemo(() => {
+  //   return [
+  //     {name:'name',labels:['first','last']},
+  //     {name:'email',labels:['email']},
+  //     {name:'phoneNumber',labels:['full']},
+  //     {name:'descriptionArray',labels:['descriptionArray']}
+  //   ]
+  // }, [])
 
 
   useEffect(() => {
@@ -50,35 +52,35 @@ function App() {
     } else {
       setIsRecognize(onRecognize);
     }
-  }, [initialRender, onRecognize, pressed]);
+  }, [initialRender, onRecognize, isDetect]);
 
   const handleRecognize = (isRecognize) => {
 
     // setIsRecognize(isRecognize);
 
     onRecognize = isRecognize;
-    // setPressed(true);
-    setPressed(true)
+    // setIsDetect(true);
+    setIsDetect(true)
   }
 
   useEffect(() => {
     const init = async () => {
       try {
         const {data} = await getFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-        console.log(data)
+        //console.log(data)
         setFields(setQuestionsArray(data.content,submissionLabels))
       } catch (error) {
         console.log(error)
       }
     }
     init();
-  },[submissionLabels])
+  },[])
 
 
   useEffect(() => {
     //console.log('fields',fields)
     if(!!fields && !!newUserInfo){
-      
+
       //console.log('user info',newUserInfo)
       setSubmission(setSubmissionArray(fields,newUserInfo))
     }
@@ -91,7 +93,7 @@ function App() {
       const init = async () => {
         try {
           const {data} = await createSubmission(process.env.REACT_APP_JOTFORM_DBFORM_ID,submission)
-          console.log(data)
+          console.log('submission',data)
         } catch (error) {
           console.log(error)
         }
@@ -100,47 +102,102 @@ function App() {
     }
   },[submission])
 
+  useEffect(() => {
+    if(isDetect && isRecognize){
+        let value = recognizedUser.map((user) => (
+          {
+            label:user[0],
+            value:user[1]
+          }
+        ))
+        console.log('recognizedUser',recognizedUser)
+        console.log('value',value)
+        //jotform.setFieldsValueByLabel(value)
+        jotform.setFieldsValueById([
+          {
+            id:'6',
+            value:'5343107823'
+          }
+        ])
+          // jotform.setFieldsValueById([
+          //   {
+          //     id: '5',
+          //     value: 'ecenurbattal@gmail.com'
+          //   },
+          //   {
+          //     id: '4',
+          //     value: 'Ece Nur Battal'
+          //   },
+          //   {
+          //     id: '6',
+          //     value: '5343107823'
+          //   },
+          // ])
+    }
+  },[isDetect, isRecognize, jotform, recognizedUser])
+
+
+  // useEffect(() => {
+  //   console.log('isDetect',isDetect)
+  //   console.log('isRecognize',isRecognize)
+  // },[isDetect,isRecognize])
+
 
 
   useEffect(() => {
-    jotform.subscribe("ready", async (form) => {
+    // console.log('isDetect',isDetect)
+    //  console.log('isRecognize',isRecognize)
+    jotform.subscribe("ready", (form) => {
       //console.log(form)
-      try {
-        const {data} = await getFormQuestions(form.formID)
-        setWidgetFormFields(setQuestionsArray(data.content,submissionLabels))
-      } catch (error) {
-        console.log(error)
-      }
-      // jotform.setFieldsValueById([
-      //   {
-      //     id: '5',
-      //     value: 'ecenurbattal@gmail.com'
-      //   },
-      //   {
-      //     id: '4',
-      //     value: 'Ece Nur Battal'
-      //   },
-      //   {
-      //     id: '6',
-      //     value: '5343107823'
-      //   },
-      //   {
-      //     id: '7',
-      //     items: [{ key: 'city', value: 'sdfkdsşlgds' }, { key: 'state', value: 'dsşlgjkdsl' }]
-      //   }
-      // ])
+     const getQuestions = async () => {
+        try {
+          const {data} = await getFormQuestions(form.formID)
+          console.log(data)
+          setWidgetFormFields(setQuestionsArray(data.content,submissionLabels))
+          console.log('widgetFormField',setQuestionsArray(data.content,submissionLabels))
+        } catch (error) {
+          console.log(error)
+        }
+     }
+     
+    getQuestions();
+    //   if(isDetect && isRecognize){
+    //     // let value = recognizedUser.map((user) => (
+    //     //   {
+    //     //     label:user[0],
+    //     //     value:user[1]
+    //     //   }
+    //     // ))
+    //     // jotform.setFieldValueByLabel(value)
+    //   // //   console.log('value',value)
+    //   console.log('ifin içindeyim')
+    //     jotform.setFieldsValueById([
+    //       {
+    //         id: '5',
+    //         value: 'ecenurbattal@gmail.com'
+    //       },
+    //       {
+    //         id: '4',
+    //         value: 'Ece Nur Battal'
+    //       },
+    //       {
+    //         id: '6',
+    //         value: '5343107823'
+    //       },
+    //     ])
+    //   }
     })
 
     //subscribe to submit event
     jotform.subscribe("submit", function () {
       console.log('submit edildi')
         jotform.getFieldsValueById(getIds(widgetFormFields),(content) => {
-          console.log('get',content)
-          if(!isRecognize) setNewUserInfo(setUserInfo(content.data,description))
+          //console.log('get',content)
+          if(isDetect && !isRecognize) setNewUserInfo(setUserInfo(content.data,description))
           jotform.sendSubmit(content);
         })
     });
-  }, [description, isRecognize, jotform, submissionLabels, widgetFormFields])
+  }, [description, isRecognize, jotform, isDetect, widgetFormFields, recognizedUser])
 
 
   // const handleRecognize = (isRecognize) => {
@@ -153,10 +210,10 @@ function App() {
     //   {!isRecognize ? <VideoInput setDescription={setDescription} onRecognize={handleRecognize} /> : <NonrecognizeAlert />}
     // </div>
     <div className="App">
-      {pressed ? (isRecognize ? <>< RecognizeAlert /></> : <><NonrecognizeAlert /></>
-      ) : console.log("initial render=true")}
+      {isDetect && (isRecognize ? <>< RecognizeAlert /></> : <><NonrecognizeAlert /></>
+      )}
 
-      <VideoInput setDescription={setDescription} onRecognized={handleRecognize} />
+      <VideoInput setDescription={setDescription} onRecognized={handleRecognize} setRecognizedUser={setRecognizedUser} />
     </div >
   );
 }
