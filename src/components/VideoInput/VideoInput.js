@@ -42,19 +42,19 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
 
     useEffect(() => {
         const init = async () => {
-        setWebcamRef(React.createRef());
-          try {
-            const {data} = await getSubmissions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-            // console.log('submissions',data.content)
-            // console.log(parseSubmissions(data.content,submissionLabels))
-            setDbFaces(parseSubmissions(data.content,submissionLabels))
-             //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))
-          } catch (error) {
-            console.log(error)
-          }
+            setWebcamRef(React.createRef());
+            try {
+                const { data } = await getSubmissions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
+                // console.log('submissions',data.content)
+                // console.log(parseSubmissions(data.content,submissionLabels))
+                setDbFaces(parseSubmissions(data.content, submissionLabels))
+                //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))
+            } catch (error) {
+                console.log(error)
+            }
         }
         init();
-      },[])
+    }, [])
 
 
     useEffect(() => {
@@ -102,7 +102,7 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
                         if (!!fullDesc) {
                             setDetections(fullDesc.map(fd => fd.detection))
                             setDescriptions(fullDesc.map(fd => fd.descriptor))
-                            if(!!(fullDesc.length)) setDescription(fullDesc.map(fd => Object.values(fd.descriptor)))
+                            if (!!(fullDesc.length)) setDescription(fullDesc.map(fd => Object.values(fd.descriptor)))
                             //console.log('fullDesc',fullDesc.map(fd => Object.values(fd.descriptor)))
                         }
                     }).catch((e) => {
@@ -124,9 +124,10 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
                 // console.log('detections',detections);
                 // console.log('match',temp)
                 if (!!temp[0] && temp[0]._label === 'unknown') {
-                    //console.log(temp)
+                    // console.log(temp)
                     onRecognized(false)
                 } else if (!!temp[0] && temp[0]._label !== 'unknown') {
+                    // console.log(temp)
                     onRecognized(true);
                     setRecognizedUser(dbFaces.filter((face) => face.id === temp[0]._label)[0])
                     //console.log('recognizedUser',Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))

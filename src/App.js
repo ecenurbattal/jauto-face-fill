@@ -11,15 +11,17 @@ import { submissionLabels } from './constants/submissionLabels';
 function App() {
 
   const jotform = window.JFCustomWidget;
-  const [fields,setFields] = useState();
-  const [widgetFormFields,setWidgetFormFields] = useState();
-  const [submission,setSubmission] = useState();
+  const [fields, setFields] = useState();
+  const [widgetFormFields, setWidgetFormFields] = useState();
+  const [submission, setSubmission] = useState();
   const [isRecognize, setIsRecognize] = useState(false);
-  const [description,setDescription] = useState();
+  const [description, setDescription] = useState();
   const [initialRender, setInıtialRender] = useState(true);
   const [isDetect, setIsDetect] = useState(false);
-  const [recognizedUser,setRecognizedUser] = useState();
-  const [newUserInfo,setNewUserInfo] = useState(
+  const [recognizedUser, setRecognizedUser] = useState();
+  const [onRecognize, setOnRecognize] = useState(null);
+
+  const [newUserInfo, setNewUserInfo] = useState(
     // [{name:'first',value:'Ece Nur'},
     // {name:'last',value:'Battal'},
     // {name:'email',value:'ecenurbattal@gmail.com'},
@@ -44,7 +46,7 @@ function App() {
   }, [])
 
 
-  let onRecognize;
+  // let onRecognize;
 
   useEffect(() => {
     if (initialRender) {
@@ -52,90 +54,104 @@ function App() {
     } else {
       setIsRecognize(onRecognize);
     }
-  }, [initialRender, onRecognize, isDetect]);
+    console.log("initial render status:", initialRender)
+    console.log("isDetectstatus:", isDetect, "isRecognizeStatus:", isRecognize)
+  }, [onRecognize, isDetect]);
 
   const handleRecognize = (isRecognize) => {
 
     // setIsRecognize(isRecognize);
-
-    onRecognize = isRecognize;
+    /*   console.log("onRecognize", onRecognize)
+      onRecognize = isRecognize;
+      console.log("handlerecognize çalıştı")
+      console.log("isRecognizeStatus:", isRecognize) */
     // setIsDetect(true);
+    if (!!isRecognize) {//if face was recognized after not recognized at the first time then show again the success alert
+      setOnRecognize(isRecognize)
+    }
+
     setIsDetect(true)
   }
 
   useEffect(() => {
     const init = async () => {
       try {
-        const {data} = await getFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
+        const { data } = await getFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
         //console.log(data)
-        setFields(setQuestionsArray(data.content,submissionLabels))
+        setFields(setQuestionsArray(data.content, submissionLabels))
       } catch (error) {
         console.log(error)
       }
     }
     init();
-  },[])
+  }, [])
 
 
   useEffect(() => {
     //console.log('fields',fields)
-    if(!!fields && !!newUserInfo){
+    if (!!fields && !!newUserInfo) {
 
       //console.log('user info',newUserInfo)
-      setSubmission(setSubmissionArray(fields,newUserInfo))
+      setSubmission(setSubmissionArray(fields, newUserInfo))
     }
-  },[fields,newUserInfo])
+  }, [fields, newUserInfo])
 
 
 
   useEffect(() => {
-    if(!!submission){
+    if (!!submission) {
       const init = async () => {
         try {
-          const {data} = await createSubmission(process.env.REACT_APP_JOTFORM_DBFORM_ID,submission)
-          console.log('submission',data)
+          const { data } = await createSubmission(process.env.REACT_APP_JOTFORM_DBFORM_ID, submission)
+          console.log('submission', data)
         } catch (error) {
           console.log(error)
         }
       }
       init();
     }
-  },[submission])
+  }, [submission])
 
   useEffect(() => {
-    if(isDetect && isRecognize){
-        // let value = recognizedUser.map((user) => (
-        //   {
-        //     label:user[0],
-        //     value:user[1]
-        //   }
-        // ))
-        // console.log('recognizedUser',recognizedUser)
-        // console.log('value',value)
-        console.log('fieldValues',setFormFieldValues(recognizedUser,widgetFormFields))
-        jotform.setFieldsValueById(setFormFieldValues(recognizedUser,widgetFormFields))
-        // jotform.setFieldsValueById([
-        //   {
-        //     id:'6',
-        //     value:'5343107823'
-        //   }
-        // ])
-          // jotform.setFieldsValueById([
-          //   {
-          //     id: '5',
-          //     value: 'ecenurbattal@gmail.com'
-          //   },
-          //   {
-          //     id: '4',
-          //     value: 'Ece Nur Battal'
-          //   },
-          //   {
-          //     id: '6',
-          //     value: '5343107823'
-          //   },
-          // ])
+    if (isDetect && isRecognize) {
+      // let value = recognizedUser.map((user) => (
+      //   {
+      //     label:user[0],
+      //     value:user[1]
+      //   }
+      // ))
+      // console.log('recognizedUser',recognizedUser)
+      // console.log('value',value)
+
+
+
+      console.log('fieldValues', setFormFieldValues(recognizedUser, widgetFormFields))
+      jotform.setFieldsValueById(setFormFieldValues(recognizedUser, widgetFormFields))
+
+
+
+      // jotform.setFieldsValueById([
+      //   {
+      //     id:'6',
+      //     value:'5343107823'
+      //   }
+      // ])
+      // jotform.setFieldsValueById([
+      //   {
+      //     id: '5',
+      //     value: 'ecenurbattal@gmail.com'
+      //   },
+      //   {
+      //     id: '4',
+      //     value: 'Ece Nur Battal'
+      //   },
+      //   {
+      //     id: '6',
+      //     value: '5343107823'
+      //   },
+      // ])
     }
-  },[isDetect, isRecognize, jotform, recognizedUser, widgetFormFields])
+  }, [isDetect, isRecognize, jotform, recognizedUser, widgetFormFields])
 
 
   // useEffect(() => {
@@ -150,53 +166,53 @@ function App() {
     //  console.log('isRecognize',isRecognize)
     jotform.subscribe("ready", (form) => {
       //console.log(form)
-     const getQuestions = async () => {
+      const getQuestions = async () => {
         try {
-          const {data} = await getFormQuestions(form.formID)
+          const { data } = await getFormQuestions(form.formID)
           console.log(data)
-          setWidgetFormFields(setQuestionsArray(data.content,submissionLabels))
-          console.log('widgetFormField',setQuestionsArray(data.content,submissionLabels))
+          setWidgetFormFields(setQuestionsArray(data.content, submissionLabels))
+          console.log('widgetFormField', setQuestionsArray(data.content, submissionLabels))
         } catch (error) {
           console.log(error)
         }
-     }
-     
-    getQuestions();
-    //   if(isDetect && isRecognize){
-    //     // let value = recognizedUser.map((user) => (
-    //     //   {
-    //     //     label:user[0],
-    //     //     value:user[1]
-    //     //   }
-    //     // ))
-    //     // jotform.setFieldValueByLabel(value)
-    //   // //   console.log('value',value)
-    //   console.log('ifin içindeyim')
-    //     jotform.setFieldsValueById([
-    //       {
-    //         id: '5',
-    //         value: 'ecenurbattal@gmail.com'
-    //       },
-    //       {
-    //         id: '4',
-    //         value: 'Ece Nur Battal'
-    //       },
-    //       {
-    //         id: '6',
-    //         value: '5343107823'
-    //       },
-    //     ])
-    //   }
+      }
+
+      getQuestions();
+      //   if(isDetect && isRecognize){
+      //     // let value = recognizedUser.map((user) => (
+      //     //   {
+      //     //     label:user[0],
+      //     //     value:user[1]
+      //     //   }
+      //     // ))
+      //     // jotform.setFieldValueByLabel(value)
+      //   // //   console.log('value',value)
+      //   console.log('ifin içindeyim')
+      //     jotform.setFieldsValueById([
+      //       {
+      //         id: '5',
+      //         value: 'ecenurbattal@gmail.com'
+      //       },
+      //       {
+      //         id: '4',
+      //         value: 'Ece Nur Battal'
+      //       },
+      //       {
+      //         id: '6',
+      //         value: '5343107823'
+      //       },
+      //     ])
+      //   }
     })
 
     //subscribe to submit event
     jotform.subscribe("submit", function () {
       console.log('submit edildi')
-        jotform.getFieldsValueById(getIds(widgetFormFields),(content) => {
-          //console.log('get',content)
-          if(isDetect && !isRecognize) setNewUserInfo(setUserInfo(content.data,description))
-          jotform.sendSubmit(content);
-        })
+      jotform.getFieldsValueById(getIds(widgetFormFields), (content) => {
+        //console.log('get',content)
+        if (isDetect && !isRecognize) setNewUserInfo(setUserInfo(content.data, description))
+        jotform.sendSubmit(content);
+      })
     });
   }, [description, isRecognize, jotform, isDetect, widgetFormFields, recognizedUser])
 
