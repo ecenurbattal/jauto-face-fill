@@ -4,7 +4,7 @@ import { createSubmission, getFormQuestions } from './services/jotform';
 import VideoInput from '../src/components/VideoInput/VideoInput';
 import { loadModels } from '../src/services/faceapi';
 import NonrecognizeAlert from './components/NonrecognizeAlert/NonrecognizeAlert';
-import { getIds, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
+import { getIds, setFormFieldValues, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
 import RecognizeAlert from './components/RecognizeAlert/RecognizeAlert';
 import { submissionLabels } from './constants/submissionLabels';
 
@@ -104,21 +104,22 @@ function App() {
 
   useEffect(() => {
     if(isDetect && isRecognize){
-        let value = recognizedUser.map((user) => (
-          {
-            label:user[0],
-            value:user[1]
-          }
-        ))
-        console.log('recognizedUser',recognizedUser)
-        console.log('value',value)
-        //jotform.setFieldsValueByLabel(value)
-        jotform.setFieldsValueById([
-          {
-            id:'6',
-            value:'5343107823'
-          }
-        ])
+        // let value = recognizedUser.map((user) => (
+        //   {
+        //     label:user[0],
+        //     value:user[1]
+        //   }
+        // ))
+        // console.log('recognizedUser',recognizedUser)
+        // console.log('value',value)
+        console.log('fieldValues',setFormFieldValues(recognizedUser,widgetFormFields))
+        jotform.setFieldsValueById(setFormFieldValues(recognizedUser,widgetFormFields))
+        // jotform.setFieldsValueById([
+        //   {
+        //     id:'6',
+        //     value:'5343107823'
+        //   }
+        // ])
           // jotform.setFieldsValueById([
           //   {
           //     id: '5',
@@ -134,7 +135,7 @@ function App() {
           //   },
           // ])
     }
-  },[isDetect, isRecognize, jotform, recognizedUser])
+  },[isDetect, isRecognize, jotform, recognizedUser, widgetFormFields])
 
 
   // useEffect(() => {

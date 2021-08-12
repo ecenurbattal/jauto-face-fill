@@ -128,7 +128,7 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
                     onRecognized(false)
                 } else if (!!temp[0] && temp[0]._label !== 'unknown') {
                     onRecognized(true);
-                    setRecognizedUser(Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))
+                    setRecognizedUser(dbFaces.filter((face) => face.id === temp[0]._label)[0])
                     //console.log('recognizedUser',Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))
                 }
                 //console.log(temp)

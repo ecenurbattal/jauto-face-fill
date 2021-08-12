@@ -34,6 +34,23 @@ export const parseSubmissions = (submissions,submissionLabels) => {
     return submissionsArray;
 }
 
+export const setFormFieldValues = (recognizedUser,widgetFormFields) => {
+    let user = Object.entries(recognizedUser);
+    let valueArray = [];
+    let fieldObject = {};
+    user.forEach((item) => {
+        widgetFormFields.forEach((field) => {
+            if(item[0]===field.name){
+                fieldObject['id']=field.qid
+                fieldObject['value']=item[1]
+            }
+        })
+        !!(fieldObject) && valueArray.push(fieldObject)
+        fieldObject = {}
+    })
+    return valueArray;
+}
+
 export const getIds = (fieldsArray) => {
     return fieldsArray.map((field) => (
         String(field.qid)
