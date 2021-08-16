@@ -108,3 +108,26 @@ export const setUserInfo = (data,description) => {
     //console.log(array)
     return array;
 }
+
+
+export const createDbFormArray = () => {
+    // let questions = []
+    // // questions['0']['type'] = 'control_head';
+    // // questions['0']['text'] = 'Jauto Face Fill Database Form';
+    // // questions['0']['name'] = 'Header';
+    // questions.push({
+    //     type:'control_head',
+    //     text: 'Jauto Face Fill Database Form',
+    //     name:'Header'
+    // })
+    // questions.push({
+    //     type:'control_fullname',
+    //     name:'name'
+    // })
+    // // questions['1']['type'] = 'control_fullname';
+    // // questions['1']['name'] = 'name';
+    // return {questions:questions};
+    return JSON.parse(
+        '{"questions":[{"type":"control_head","text":"Form Title","order":"1","name":"Header"},{"type":"control_textbox","text":"Text Box Title","order":"2","name":"TextBox","validation":"None","required":"No","readonly":"No","size":"20","labelAlign":"Auto","hint":""}],"properties":{"title":"New Form","height":"600"}}'
+    )
+}

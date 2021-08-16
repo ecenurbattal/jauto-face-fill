@@ -23,7 +23,7 @@ export const getFullFaceDescriptions = async (blob, inputSize = 512) => {
     /*  if (!fullFaceDescription) {
          throw new Error(`no faces detected for ${label}`)
      } */
-    console.log(fullFaceDescriptions)
+    //console.log(fullFaceDescriptions)
     return fullFaceDescriptions;
 }
 

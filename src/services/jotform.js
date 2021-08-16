@@ -8,8 +8,16 @@ const instance = axios.create({
     }
 })
 
-export const getFormQuestions = (formId) => {
-    return instance.get(`/form/${formId}/questions`);
+export const getDbFormQuestions = (formId) => {
+    return instance.get(`/form/${formId}/questions`)
+}
+
+export const getWidgetFormQuestions = (formId) => {
+    return axios.get(`https://api.jotform.com/form/${formId}/questions`,{
+        params:{
+            apiKey:localStorage.getItem('apiKey')
+        }
+    });
 }
 
 export const createSubmission = (formId,submission) => {
@@ -17,5 +25,12 @@ export const createSubmission = (formId,submission) => {
 }
 
 export const getSubmissions = (formId) => {
+    //console.log('apiKey',localStorage.getItem('apiKey'))
     return instance.get(`/form/${formId}/submissions`);
+}
+
+export const createForm = (form) => {
+    return instance.post('/form',null,{
+        params:form
+    })
 }

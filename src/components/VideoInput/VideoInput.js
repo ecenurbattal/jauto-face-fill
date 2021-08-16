@@ -45,7 +45,7 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
             setWebcamRef(React.createRef());
             try {
                 const { data } = await getSubmissions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-                // console.log('submissions',data.content)
+                console.log('submissions',data.content)
                 // console.log(parseSubmissions(data.content,submissionLabels))
                 setDbFaces(parseSubmissions(data.content, submissionLabels))
                 //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))

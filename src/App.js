@@ -1,10 +1,10 @@
 import './App.css';
 import { useEffect, useState } from 'react';
-import { createSubmission, getFormQuestions } from './services/jotform';
+import { createForm, createSubmission, getDbFormQuestions, getWidgetFormQuestions } from './services/jotform';
 import VideoInput from '../src/components/VideoInput/VideoInput';
 import { loadModels } from '../src/services/faceapi';
 import NonrecognizeAlert from './components/NonrecognizeAlert/NonrecognizeAlert';
-import { getIds, setFormFieldValues, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
+import { createDbFormArray, getIds, setFormFieldValues, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
 import RecognizeAlert from './components/RecognizeAlert/RecognizeAlert';
 import { submissionLabels } from './constants/submissionLabels';
 
@@ -54,9 +54,9 @@ function App() {
     } else {
       setIsRecognize(onRecognize);
     }
-    console.log("initial render status:", initialRender)
-    console.log("isDetectstatus:", isDetect, "isRecognizeStatus:", isRecognize)
-  }, [onRecognize, isDetect]);
+    // console.log("initial render status:", initialRender)
+    // console.log("isDetectstatus:", isDetect, "isRecognizeStatus:", isRecognize)
+  }, [onRecognize, initialRender]);
 
   const handleRecognize = (isRecognize) => {
 
@@ -76,7 +76,21 @@ function App() {
   useEffect(() => {
     const init = async () => {
       try {
-        const { data } = await getFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
+        console.log(createDbFormArray())
+        const { data } = await createForm(createDbFormArray())
+        //console.log(data)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    init();
+  }, [])
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const { data } = await getDbFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
         //console.log(data)
         setFields(setQuestionsArray(data.content, submissionLabels))
       } catch (error) {
@@ -166,9 +180,11 @@ function App() {
     //  console.log('isRecognize',isRecognize)
     jotform.subscribe("ready", (form) => {
       //console.log(form)
+
+      localStorage.setItem('apiKey',jotform.getWidgetSetting('apiKey'))
       const getQuestions = async () => {
         try {
-          const { data } = await getFormQuestions(form.formID)
+          const { data } = await getWidgetFormQuestions(form.formID)
           console.log(data)
           setWidgetFormFields(setQuestionsArray(data.content, submissionLabels))
           console.log('widgetFormField', setQuestionsArray(data.content, submissionLabels))
