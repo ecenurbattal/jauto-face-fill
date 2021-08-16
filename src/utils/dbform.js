@@ -110,7 +110,7 @@ export const setUserInfo = (data,description) => {
 }
 
 
-export const createDbFormArray = () => {
+export const createDbFormData = (dbFormDataConstants) => {
     // let questions = []
     // // questions['0']['type'] = 'control_head';
     // // questions['0']['text'] = 'Jauto Face Fill Database Form';
@@ -127,7 +127,12 @@ export const createDbFormArray = () => {
     // // questions['1']['type'] = 'control_fullname';
     // // questions['1']['name'] = 'name';
     // return {questions:questions};
-    return JSON.parse(
-        '{"questions":[{"type":"control_head","text":"Form Title","order":"1","name":"Header"},{"type":"control_textbox","text":"Text Box Title","order":"2","name":"TextBox","validation":"None","required":"No","readonly":"No","size":"20","labelAlign":"Auto","hint":""}],"properties":{"title":"New Form","height":"600"}}'
-    )
+    const fd = new FormData();
+    // fd.append('questions[0][type]','control_head');
+    // fd.append('questions[0][text]', 'Jauto Face Fill Database Form')
+    // fd.append('properties[title]','Jauto Face Fill Database Form')
+    Object.values(dbFormDataConstants).forEach((item) => {
+        fd.append()
+    })
+    return fd;
 }

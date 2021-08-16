@@ -30,7 +30,5 @@ export const getSubmissions = (formId) => {
 }
 
 export const createForm = (form) => {
-    return instance.post('/form',null,{
-        params:form
-    })
+    return instance.post('/form',form)
 }

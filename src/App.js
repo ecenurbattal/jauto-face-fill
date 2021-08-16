@@ -73,25 +73,25 @@ function App() {
     setIsDetect(true)
   }
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        console.log(createDbFormArray())
-        const { data } = await createForm(createDbFormArray())
-        //console.log(data)
-        console.log(data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    init();
-  }, [])
+  // useEffect(() => {
+  //   const init = async () => {
+  //     try {
+  //       console.log(createDbFormArray())
+  //       const { data } = await createForm(createDbFormArray())
+  //       //console.log(data)
+  //       console.log(data)
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   }
+  //   init();
+  // }, [])
 
   useEffect(() => {
     const init = async () => {
       try {
         const { data } = await getDbFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-        //console.log(data)
+        console.log('dbForm',data)
         setFields(setQuestionsArray(data.content, submissionLabels))
       } catch (error) {
         console.log(error)
