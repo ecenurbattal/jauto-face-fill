@@ -7,7 +7,7 @@ import { parseSubmissions } from '../../utils/dbform';
 import { submissionLabels } from '../../constants/submissionLabels';
 //import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
-const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
+const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser }) => {
     // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
@@ -44,17 +44,19 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
         const init = async () => {
             setWebcamRef(React.createRef());
             try {
-                const { data } = await getSubmissions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
+               if(dbFormId){
+                const { data } = await getSubmissions(dbFormId);
                 console.log('submissions',data.content)
                 // console.log(parseSubmissions(data.content,submissionLabels))
                 setDbFaces(parseSubmissions(data.content, submissionLabels))
                 //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))
+               }
             } catch (error) {
                 console.log(error)
             }
         }
         init();
-    }, [])
+    }, [dbFormId])
 
 
     useEffect(() => {
@@ -62,8 +64,9 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
             if (!!dbFaces) {
                 //console.log('dbFaces',dbFaces)
                 setFaceMatcher(createMatcher(dbFaces))
-                setInputDevice();
+                
             }
+            setInputDevice();
         }
         init();
 
@@ -118,22 +121,28 @@ const VideoInput = ({ onRecognized, setDescription, setRecognizedUser }) => {
 
     useEffect(() => {
         const init = () => {
-            if (!!descriptions && !!faceMatcher) {
+            if (!!descriptions && !!(descriptions.length)) {
                 //console.log('description', descriptions)
-                let temp = descriptions.map(desc => faceMatcher.findBestMatch(desc))
-                // console.log('detections',detections);
-                // console.log('match',temp)
-                if (!!temp[0] && temp[0]._label === 'unknown') {
-                    // console.log(temp)
+                if(!!faceMatcher && (!!dbFaces.length)){
+                    let temp = descriptions.map(desc => faceMatcher.findBestMatch(desc))
+                      // console.log('match',temp)
+                    if (!!temp[0] && temp[0]._label === 'unknown') {
+                        // console.log(temp)
+                        onRecognized(false)
+                    } else if (!!temp[0] && temp[0]._label !== 'unknown') {
+                        // console.log(temp)
+                        onRecognized(true);
+                        setRecognizedUser(dbFaces.filter((face) => face.id === temp[0]._label)[0])
+                        //console.log('recognizedUser',Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))
+                    }
+                    //console.log(temp)
+                    setMatch(temp)
+                } else {
                     onRecognized(false)
-                } else if (!!temp[0] && temp[0]._label !== 'unknown') {
-                    // console.log(temp)
-                    onRecognized(true);
-                    setRecognizedUser(dbFaces.filter((face) => face.id === temp[0]._label)[0])
-                    //console.log('recognizedUser',Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))
                 }
-                //console.log(temp)
-                setMatch(temp)
+                
+                // console.log('detections',detections);
+              
             }
         }
         init();

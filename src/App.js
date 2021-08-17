@@ -1,12 +1,13 @@
 import './App.css';
 import { useEffect, useState } from 'react';
-import { createForm, createSubmission, getDbFormQuestions, getWidgetFormQuestions } from './services/jotform';
+import { createForm, createSubmission, getFormQuestions, getForms } from './services/jotform';
 import VideoInput from '../src/components/VideoInput/VideoInput';
 import { loadModels } from '../src/services/faceapi';
 import NonrecognizeAlert from './components/NonrecognizeAlert/NonrecognizeAlert';
-import { createDbFormArray, getIds, setFormFieldValues, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
+import { createDbFormData, getIds, setFormFieldValues, setQuestionsArray, setSubmissionArray, setUserInfo } from './utils/dbform';
 import RecognizeAlert from './components/RecognizeAlert/RecognizeAlert';
 import { submissionLabels } from './constants/submissionLabels';
+import { dbFormData } from './constants/dbFormData';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
   const [isDetect, setIsDetect] = useState(false);
   const [recognizedUser, setRecognizedUser] = useState();
   const [onRecognize, setOnRecognize] = useState(null);
+  const [dbFormId,setDbFormId] = useState();
 
   const [newUserInfo, setNewUserInfo] = useState(
     // [{name:'first',value:'Ece Nur'},
@@ -73,32 +75,42 @@ function App() {
     setIsDetect(true)
   }
 
-  // useEffect(() => {
-  //   const init = async () => {
-  //     try {
-  //       console.log(createDbFormArray())
-  //       const { data } = await createForm(createDbFormArray())
-  //       //console.log(data)
-  //       console.log(data)
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-  //   }
-  //   init();
-  // }, [])
-
   useEffect(() => {
     const init = async () => {
       try {
-        const { data } = await getDbFormQuestions(process.env.REACT_APP_JOTFORM_DBFORM_ID);
-        console.log('dbForm',data)
-        setFields(setQuestionsArray(data.content, submissionLabels))
+        const response = await getForms();
+        console.log(response)
+        const dbForm = response.data.content.filter((form) => form.status !== 'DELETED' && form.title === 'Jauto Face Fill Database Form');
+        console.log('dbForm',dbForm)
+        if(!(dbForm.length)){
+          const { data } = await createForm(createDbFormData(dbFormData))
+          console.log('olusturulan form data',data)
+          setDbFormId(data.content.id)
+        } else {
+          setDbFormId(dbForm[0].id)
+        }
       } catch (error) {
         console.log(error)
       }
     }
     init();
   }, [])
+
+  useEffect(() => {
+    const init = async () => {
+      //console.log('dbFormId',dbFormId)
+      if(!!dbFormId){
+        try {
+          const { data } = await getFormQuestions(dbFormId);
+          //console.log('dbFormQuestions',data)
+          setFields(setQuestionsArray(data.content, submissionLabels))
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    }
+    init();
+  }, [dbFormId])
 
 
   useEffect(() => {
@@ -113,10 +125,10 @@ function App() {
 
 
   useEffect(() => {
-    if (!!submission) {
+    if (!!submission && !!dbFormId) {
       const init = async () => {
         try {
-          const { data } = await createSubmission(process.env.REACT_APP_JOTFORM_DBFORM_ID, submission)
+          const { data } = await createSubmission(dbFormId, submission)
           console.log('submission', data)
         } catch (error) {
           console.log(error)
@@ -124,7 +136,7 @@ function App() {
       }
       init();
     }
-  }, [submission])
+  }, [submission,dbFormId])
 
   useEffect(() => {
     if (isDetect && isRecognize) {
@@ -184,8 +196,8 @@ function App() {
       localStorage.setItem('apiKey',jotform.getWidgetSetting('apiKey'))
       const getQuestions = async () => {
         try {
-          const { data } = await getWidgetFormQuestions(form.formID)
-          console.log(data)
+          const {data} = await getFormQuestions(form.formID)
+          //console.log('getWidgetQuestions',response)
           setWidgetFormFields(setQuestionsArray(data.content, submissionLabels))
           console.log('widgetFormField', setQuestionsArray(data.content, submissionLabels))
         } catch (error) {
@@ -246,7 +258,7 @@ function App() {
       {isDetect && (isRecognize ? <>< RecognizeAlert /></> : <><NonrecognizeAlert /></>
       )}
 
-      <VideoInput setDescription={setDescription} onRecognized={handleRecognize} setRecognizedUser={setRecognizedUser} />
+      <VideoInput dbFormId={dbFormId} setDescription={setDescription} onRecognized={handleRecognize} setRecognizedUser={setRecognizedUser} />
     </div >
   );
 }

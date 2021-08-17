@@ -111,28 +111,24 @@ export const setUserInfo = (data,description) => {
 
 
 export const createDbFormData = (dbFormDataConstants) => {
-    // let questions = []
-    // // questions['0']['type'] = 'control_head';
-    // // questions['0']['text'] = 'Jauto Face Fill Database Form';
-    // // questions['0']['name'] = 'Header';
-    // questions.push({
-    //     type:'control_head',
-    //     text: 'Jauto Face Fill Database Form',
-    //     name:'Header'
-    // })
-    // questions.push({
-    //     type:'control_fullname',
-    //     name:'name'
-    // })
-    // // questions['1']['type'] = 'control_fullname';
-    // // questions['1']['name'] = 'name';
-    // return {questions:questions};
     const fd = new FormData();
     // fd.append('questions[0][type]','control_head');
     // fd.append('questions[0][text]', 'Jauto Face Fill Database Form')
+    // fd.append('questions[1][type]','control_fullname')
+    // fd.append('questions[1][text]','Name')
     // fd.append('properties[title]','Jauto Face Fill Database Form')
-    Object.values(dbFormDataConstants).forEach((item) => {
-        fd.append()
+    // fd.append('properties[theme]','default_theme')
+    dbFormDataConstants.questions.forEach((item,index) => {
+        // console.log('questions',item)
+        // console.log('index',index)
+        fd.append(`questions[${index}][type]`,item.type);
+        fd.append(`questions[${index}][text]`,item.text);
+        fd.append(`questions[${index}][order]`,index);
+        fd.append(`questions[${index}][name]`,item.name);
+    })
+    Object.entries(dbFormDataConstants.properties).forEach((item) => {
+        //console.log('properties',item)
+        fd.append(`properties[${item[0]}]`,item[1])
     })
     return fd;
 }

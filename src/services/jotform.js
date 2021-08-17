@@ -3,22 +3,26 @@ import axios from 'axios';
 const instance = axios.create({
     baseURL:process.env.REACT_APP_JOTFORM_API_URL,
     params:{
-        apiKey:process.env.REACT_APP_JOTFORM_API_KEY,
+        apiKey:localStorage.getItem('apiKey'),
         debug:true
     }
 })
 
-export const getDbFormQuestions = (formId) => {
+export const getFormQuestions = (formId) => {
     return instance.get(`/form/${formId}/questions`)
 }
 
-export const getWidgetFormQuestions = (formId) => {
-    return axios.get(`https://api.jotform.com/form/${formId}/questions`,{
-        params:{
-            apiKey:localStorage.getItem('apiKey')
-        }
-    });
+export const getForms = () => {
+    return instance.get(`/user/forms`)
 }
+
+// export const getWidgetFormQuestions = (formId) => {
+//     return axios.get(`https://api.jotform.com/form/${formId}/questions`,{
+//         params:{
+//             apiKey:localStorage.getItem('apiKey')
+//         }
+//     });
+// }
 
 export const createSubmission = (formId,submission) => {
     return instance.post(`/form/${formId}/submissions`,submission)
