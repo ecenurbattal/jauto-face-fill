@@ -43,6 +43,7 @@ function App() {
   useEffect(() => {
     const init = async () => {
       await loadModels();
+      //window.top.scrollTo(0,300);
     }
     init();
   }, [])
@@ -155,6 +156,7 @@ function App() {
       jotform.setFieldsValueById(setFormFieldValues(recognizedUser, widgetFormFields))
 
 
+      //window.top.scrollTo(0,300);
 
       // jotform.setFieldsValueById([
       //   {
@@ -192,12 +194,11 @@ function App() {
     //  console.log('isRecognize',isRecognize)
     jotform.subscribe("ready", (form) => {
       //console.log(form)
-
       localStorage.setItem('apiKey',jotform.getWidgetSetting('apiKey'))
       const getQuestions = async () => {
         try {
           const {data} = await getFormQuestions(form.formID)
-          //console.log('getWidgetQuestions',response)
+          //console.log('getWidgetQuestions',data)
           setWidgetFormFields(setQuestionsArray(data.content, submissionLabels))
           console.log('widgetFormField', setQuestionsArray(data.content, submissionLabels))
         } catch (error) {
@@ -258,7 +259,13 @@ function App() {
       {isDetect && (isRecognize ? <>< RecognizeAlert /></> : <><NonrecognizeAlert /></>
       )}
 
-      <VideoInput dbFormId={dbFormId} setDescription={setDescription} onRecognized={handleRecognize} setRecognizedUser={setRecognizedUser} />
+      <VideoInput 
+      dbFormId={dbFormId} 
+      setDescription={setDescription} 
+      onRecognized={handleRecognize} 
+      setRecognizedUser={setRecognizedUser} 
+      recognizedUser={recognizedUser}
+      />
     </div >
   );
 }

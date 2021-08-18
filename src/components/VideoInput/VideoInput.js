@@ -7,7 +7,7 @@ import { parseSubmissions } from '../../utils/dbform';
 import { submissionLabels } from '../../constants/submissionLabels';
 //import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
-const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser }) => {
+const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser, recognizedUser }) => {
     // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
@@ -18,7 +18,6 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser 
     const [webcamRef, setWebcamRef] = useState();
     const [match, setMatch] = useState();
     const [videoConstraints, setVideoConstraints] = useState();
-    const [camera, setCamera] = useState();
     const [detections, setDetections] = useState();
 
     const WIDTH = 420;
@@ -79,12 +78,6 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser 
                 height: HEIGHT,
                 facingMode: facingMode
             })
-
-            if (facingMode === 'user') {
-                setCamera('Front')
-            } else {
-                setCamera('Back')
-            }
         }
     }
         , [facingMode])
@@ -133,7 +126,7 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser 
                         // console.log(temp)
                         onRecognized(true);
                         setRecognizedUser(dbFaces.filter((face) => face.id === temp[0]._label)[0])
-                        //console.log('recognizedUser',Object.entries(dbFaces.filter((face) => face.id === temp[0]._label)[0]))
+                        //console.log('recognizedUser',dbFaces.filter((face) => face.id === temp[0]._label)[0])
                     }
                     //console.log(temp)
                     setMatch(temp)
@@ -172,7 +165,7 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser 
                                     transform: `translate(${_X}px,${_Y}px)`
                                 }}
                             >
-                                {!!match && !!match[i] ? (
+                               
                                     <p
                                         style={{
                                             backgroundColor: 'blue',
@@ -184,9 +177,9 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser 
                                             transform: `translate(-3px,${_H}px)`
                                         }}
                                     >
-                                        {match[i]._label}
+                                        {recognizedUser ? recognizedUser.name : "I couldn't recognize"}
                                     </p>
-                                ) : null}
+                             
                             </div>
                         </div>
                     );
@@ -195,7 +188,7 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser 
             }
         }
         drawDetection();
-    }, [detections, match])
+    }, [detections, match, recognizedUser])
 
 
     const setInputDevice = () => {
@@ -227,7 +220,6 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser 
                 alignItems: 'center'
             }}
         >
-            <p>Camera: {camera}</p>
             <div
                 style={{
                     width: WIDTH,

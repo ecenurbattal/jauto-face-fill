@@ -24,8 +24,9 @@ export const parseSubmissions = (submissions,submissionLabels) => {
             if(submissionLabels.some((label) => (
                 label.name === answer.name
             ))){
-                submissionObject[`${answer.name}`] = answer.name === 'descriptionArray' ? Object.values(answer.answer).toString() : Object.values(answer.answer).toString().replace(',',' ')
+                //submissionObject[`${answer.name}`] = answer.name === 'descriptionArray' ? Object.values(answer.answer).toString() : (answer.name === 'date' ? Object.values(answer.answer).toString().replaceAll(',','-') : Object.values(answer.answer).toString().replaceAll(',',' '))
                 //console.log(answer.prettyFormat.length ? answer.prettyFormat : Object.values(answer.answer).toString())
+                submissionObject[`${answer.name}`] = answer.name === 'descriptionArray' ? Object.values(answer.answer).toString() : Object.values(answer.answer).toString().replaceAll(',',' ')
             }
         })
         !!(submissionObject) && submissionsArray.push({...submissionObject,id:submission.id})
@@ -95,6 +96,14 @@ export const setUserInfo = (data,description) => {
             // array.push({name:'first',value:item.value.substr(0,item.value.indexOf(' '))})
             // array.push({name:'last',value:item.value.substr(item.value.indexOf(' ')+1,item.value.length)})
                 break;
+            // case 'control_datetime':
+            //     //var date = item.value.replace(/^\s+|\s+$/g, '-');
+            //     var date = item.value.split('-');
+            //     console.log('date',date)
+            //     array.push({name:'month',value:date[0]})
+            //     array.push({name:'day',value:date[1]})
+            //     array.push({name:'year',value:date[2]})
+            //     break;
             case 'control_email':
                 array.push({name:'email',value:item.value})
                 break;
