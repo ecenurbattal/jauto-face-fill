@@ -8,7 +8,6 @@ export const setQuestionsArray = (dbContent,submissionLabels) => {
             qid:item.qid,
             name:item.name,
             sub_labels:submissionLabels.filter((label) => label.name === item.name)[0].labels
-            //sub_labels: item.sublabels ? Object.values(item.sublabels) : item.subLabel
           })
         }
     })
@@ -24,8 +23,6 @@ export const parseSubmissions = (submissions,submissionLabels) => {
             if(submissionLabels.some((label) => (
                 label.name === answer.name
             ))){
-                //submissionObject[`${answer.name}`] = answer.name === 'descriptionArray' ? Object.values(answer.answer).toString() : (answer.name === 'date' ? Object.values(answer.answer).toString().replaceAll(',','-') : Object.values(answer.answer).toString().replaceAll(',',' '))
-                //console.log(answer.prettyFormat.length ? answer.prettyFormat : Object.values(answer.answer).toString())
                 submissionObject[`${answer.name}`] = answer.name === 'descriptionArray' ? Object.values(answer.answer).toString() : Object.values(answer.answer).toString().replaceAll(',',' ')
             }
         })
@@ -76,10 +73,6 @@ export const setSubmissionArray = (fields,values) => {
 
 export const setUserInfo = (data,description) => {
     let array = [];
-    // [{name:'first',value:'Ece Nur'},
-    // {name:'last',value:'Battal'},
-    // {name:'email',value:'ecenurbattal@gmail.com'},
-    // {name:'full',value:'5343107823'}]
     data.forEach((item) => {
         array.push({name:'descriptionArray',value:description})
         switch (item.type) {
@@ -93,17 +86,7 @@ export const setUserInfo = (data,description) => {
                     array.push({name:'first',value:name[0]})
                     array.push({name:'last',value:name[1]})
                 }
-            // array.push({name:'first',value:item.value.substr(0,item.value.indexOf(' '))})
-            // array.push({name:'last',value:item.value.substr(item.value.indexOf(' ')+1,item.value.length)})
                 break;
-            // case 'control_datetime':
-            //     //var date = item.value.replace(/^\s+|\s+$/g, '-');
-            //     var date = item.value.split('-');
-            //     console.log('date',date)
-            //     array.push({name:'month',value:date[0]})
-            //     array.push({name:'day',value:date[1]})
-            //     array.push({name:'year',value:date[2]})
-            //     break;
             case 'control_email':
                 array.push({name:'email',value:item.value})
                 break;
@@ -114,29 +97,19 @@ export const setUserInfo = (data,description) => {
                 break;
         }
     })
-    //console.log(array)
     return array;
 }
 
 
 export const createDbFormData = (dbFormDataConstants) => {
     const fd = new FormData();
-    // fd.append('questions[0][type]','control_head');
-    // fd.append('questions[0][text]', 'Jauto Face Fill Database Form')
-    // fd.append('questions[1][type]','control_fullname')
-    // fd.append('questions[1][text]','Name')
-    // fd.append('properties[title]','Jauto Face Fill Database Form')
-    // fd.append('properties[theme]','default_theme')
     dbFormDataConstants.questions.forEach((item,index) => {
-        // console.log('questions',item)
-        // console.log('index',index)
         fd.append(`questions[${index}][type]`,item.type);
         fd.append(`questions[${index}][text]`,item.text);
         fd.append(`questions[${index}][order]`,index);
         fd.append(`questions[${index}][name]`,item.name);
     })
     Object.entries(dbFormDataConstants.properties).forEach((item) => {
-        //console.log('properties',item)
         fd.append(`properties[${item[0]}]`,item[1])
     })
     return fd;

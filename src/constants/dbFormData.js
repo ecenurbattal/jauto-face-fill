@@ -20,11 +20,6 @@ export const dbFormData = {
             name:'phoneNumber',
             text:'Phone Number'
         },
-        // {
-        //     type:'control_datetime',
-        //     name:'date',
-        //     text:'Birth Date'
-        // },
         {
             type:'control_textarea',
             name:'descriptionArray',

@@ -1,14 +1,11 @@
 import Webcam from 'react-webcam';
 import React, { useEffect, useState } from 'react'
 import { createMatcher, getFullFaceDescriptions } from '../../services/faceapi';
-//import axios from 'axios';
 import { getSubmissions } from '../../services/jotform';
 import { parseSubmissions } from '../../utils/dbform';
 import { submissionLabels } from '../../constants/submissionLabels';
-//import { Camera, DetectionBox, DetectionDrawWrapper, Label, WebcamWrapper, Wrapper } from './VideoInput.styles';
 
 const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser, recognizedUser }) => {
-    // const JSON_PROFILE = require('../db.json');
 
     const [drawBox, setDrawBox] = useState(null);
     const [dbFaces, setDbFaces] = useState(null);
@@ -24,31 +21,13 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser,
     const HEIGHT = 420;
     const inputSize = 160;
 
-    // useEffect(() => {
-    //     const init = async () => {
-    //         setWebcamRef(React.createRef());
-    //         try {
-    //             const { data } = await axios.get('./db.json')
-    //             setDbFaces(data.users)
-
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-    //     }
-    //     init();
-
-    // }, [])
-
     useEffect(() => {
         const init = async () => {
             setWebcamRef(React.createRef());
             try {
                if(dbFormId){
                 const { data } = await getSubmissions(dbFormId);
-                console.log('submissions',data.content)
-                // console.log(parseSubmissions(data.content,submissionLabels))
                 setDbFaces(parseSubmissions(data.content, submissionLabels))
-                //console.log(JSON.parse(data.content[3].answers[7].answer.descriptionArray))
                }
             } catch (error) {
                 console.log(error)
@@ -61,7 +40,6 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser,
     useEffect(() => {
         const init = async () => {
             if (!!dbFaces) {
-                //console.log('dbFaces',dbFaces)
                 setFaceMatcher(createMatcher(dbFaces))
                 
             }
@@ -85,11 +63,6 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser,
     useEffect(() => {
         const interval = setInterval(() => {
             const capture = async () => {
-                // const contentType = 'image/png'
-                // const blob = b64toBlob(webcamRef.current.getScreenshot(), contentType);
-                // const blobUrl = URL.createObjectURL(blob);
-                // URL.createObjectURL(new Blob([/*whatever content*/], { type: 'text/plain' }));
-                //URL.createObjectURL(new Blob([webcamRef.current.getScreenshot()], { type: 'image/*' }))//önemli olabilir
                 if (!!webcamRef.current) {
                     await getFullFaceDescriptions(
                         webcamRef.current.getScreenshot(),
@@ -99,7 +72,6 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser,
                             setDetections(fullDesc.map(fd => fd.detection))
                             setDescriptions(fullDesc.map(fd => fd.descriptor))
                             if (!!(fullDesc.length)) setDescription(fullDesc.map(fd => Object.values(fd.descriptor)))
-                            //console.log('fullDesc',fullDesc.map(fd => Object.values(fd.descriptor)))
                         }
                     }).catch((e) => {
                         console.error(e)
@@ -115,27 +87,18 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser,
     useEffect(() => {
         const init = () => {
             if (!!descriptions && !!(descriptions.length)) {
-                //console.log('description', descriptions)
                 if(!!faceMatcher && (!!dbFaces.length)){
                     let temp = descriptions.map(desc => faceMatcher.findBestMatch(desc))
-                      // console.log('match',temp)
                     if (!!temp[0] && temp[0]._label === 'unknown') {
-                        // console.log(temp)
                         onRecognized(false)
                     } else if (!!temp[0] && temp[0]._label !== 'unknown') {
-                        // console.log(temp)
                         onRecognized(true);
                         setRecognizedUser(dbFaces.filter((face) => face.id === temp[0]._label)[0])
-                        //console.log('recognizedUser',dbFaces.filter((face) => face.id === temp[0]._label)[0])
                     }
-                    //console.log(temp)
                     setMatch(temp)
                 } else {
                     onRecognized(false)
                 }
-                
-                // console.log('detections',detections);
-              
             }
         }
         init();
@@ -144,9 +107,6 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser,
 
     useEffect(() => {
         const drawDetection = () => {
-            // let videoConstraints = null;
-            // let camera = '';
-
             if (!!detections) {
                 let temp = detections.map((detection, i) => {
                     let _H = detection.box.height;
