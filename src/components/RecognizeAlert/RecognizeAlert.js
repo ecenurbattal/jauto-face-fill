@@ -34,8 +34,8 @@ const RecognizeAlert = () => {
             <div>
 
                 <Alert severity="success" >
-                    <AlertTitle style={{alignItems:"center",justifyContent:"center"}}>Face Recognized. Your personal information has been filled.</AlertTitle>
-                    {/* <strong>Recognized</strong> */}
+                    <AlertTitle style={{alignItems:"center",justifyContent:"center"}}>Face Recognized.</AlertTitle>
+                    <strong>Your personal information has been filled.</strong>
                 </Alert>
             </div >
         </OuterRecognized>
