@@ -6,3 +6,4 @@ When you add the widget to your form, it tries to identify the person filling ou
 #### Note: You need to enter your jotform apiKey in the widget settings.
 
 #### You can try the widget on the form by clicking the link [here](https://form.jotform.com/212296882596067).
+#### You can see the widget by clicking the link [here](https://www.jotform.com/tr/widgets/jauto-fill-face-demo)
