@@ -177,7 +177,7 @@ const VideoInput = ({ dbFormId, onRecognized, setDescription, setRecognizedUser,
                                             transform: `translate(-3px,${_H}px)`
                                         }}
                                     >
-                                        {recognizedUser ? ((!!match && match[0]._label !== 'unknown') ? recognizedUser.name : "Another face already was recognized") : "I couldn't recognize"}
+                                        {recognizedUser ? ((!!match && match[0]._label !== 'unknown') ? recognizedUser.name : "Another face was already recognized") : "I couldn't recognize"}
                                     </p>
                              
                             </div>
