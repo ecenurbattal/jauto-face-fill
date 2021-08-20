@@ -6,3 +6,4 @@ When you add the widget to your form, it tries to identify the person filling ou
 #### Note: You need to enter your jotform apiKey in the widget settings.
 
 #### You can try the widget on the form by clicking the link [here](https://form.jotform.com/212296882596067).
+![PODO_recognized](https://user-images.githubusercontent.com/58824480/130197942-513ec2ac-4796-4acc-acfc-ceed15b55768.png)
